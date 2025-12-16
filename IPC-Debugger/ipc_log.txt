@@ -1,0 +1,33 @@
+[23:17:34] [PIPE] Message sent
+[23:17:35] [PIPE] Message received
+[23:17:36] [MESSAGE_QUEUE] Message sent
+[23:17:37] [MESSAGE_QUEUE] Message received
+[23:17:38] [SHARED_MEMORY] Data written
+[23:17:39] [SHARED_MEMORY] Data read
+[23:17:45] [SHARED_MEMORY] Data written
+[23:17:46] [SHARED_MEMORY] Data read
+[23:18:40] [PIPE] Message sent
+[23:18:40] [PIPE] Message received
+[23:18:41] [MESSAGE_QUEUE] Message sent
+[23:18:42] [MESSAGE_QUEUE] Message received
+[23:31:25] [PIPE] Message sent
+[23:31:25] [PIPE] Message received
+[23:31:28] [MESSAGE_QUEUE] Message sent
+[23:31:28] [MESSAGE_QUEUE] Message received
+[23:31:30] [SHARED_MEMORY] Data written
+[23:31:30] [SHARED_MEMORY] Data read
+[23:43:19] [PIPE] Message sent
+[23:43:19] [PIPE] Message received
+[23:44:47] [SYSTEM] IPC Debugger Started
+[23:45:22] [SYSTEM] IPC Debugger Started
+[23:45:25] [PIPE] Pipe sender wrote data
+[23:45:25] [PIPE] Pipe receiver read data
+[23:45:29] [MESSAGE_QUEUE] Message enqueued
+[23:45:29] [MESSAGE_QUEUE] Message dequeued
+[23:45:31] [SHARED_MEMORY] Shared memory written
+[23:45:31] [SHARED_MEMORY] Shared memory read
+[23:45:47] [DEADLOCK] Deadlock simulation executed
+[23:46:47] [SYSTEM] IPC Debugger Terminated
+[23:47:14] [SYSTEM] IPC Debugger Started
+[23:47:17] [SYSTEM] IPC Debugger Terminated
+[23:47:28] [SYSTEM] IPC Debugger Started
