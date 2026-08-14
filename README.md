@@ -1,4 +1,4 @@
-# IPC Debugger
+# IPC Debugger — Win32 Concurrency & IPC Diagnostic Utility
 
 A multi-threaded Windows C console application for simulating, synchronizing, and inspecting Inter-Process Communication (IPC) mechanisms, thread lifecycle states, and concurrency deadlocks.
 
@@ -6,15 +6,15 @@ A multi-threaded Windows C console application for simulating, synchronizing, an
 
 ## GitHub Repository
 
-- **GitHub Repository**: [https://github.com/Sparsh88/IPC-Debugger](https://github.com/Sparsh88/IPC-Debugger)
+- **GitHub Repository:** [https://github.com/Sparsh88/IPC-Debugger](https://github.com/Sparsh88/IPC-Debugger)
 
 ---
 
 ## Overview
 
-**IPC Debugger** is a simulation and diagnostic console utility written in C for the Windows operating system. Developed to explore core operating system principles, it models primary inter-process communication mechanisms—**Pipes**, **Message Queues**, and **Shared Memory**—using native Win32 multi-threading and synchronization primitives.
+IPC Debugger is a simulation and diagnostic console utility written in C for the Windows operating system. Developed to explore core operating system principles, it models primary inter-process communication mechanisms—**Pipes**, **Message Queues**, and **Shared Memory**—using native Win32 multi-threading and synchronization primitives.
 
-The project provides interactive tools to observe how concurrent threads exchange data, transition through execution states, handle mutex locks, and recover or stall during resource contention. It features a built-in thread registry, an in-memory event buffer, an aggregate operation metrics dashboard, and thread-safe persistent logging.
+The project provides interactive tools to observe how concurrent threads exchange data, transition through execution states, handle critical section mutex locks, and recover or stall during resource contention. It features a built-in thread registry, an in-memory event buffer, an aggregate operation metrics dashboard, and thread-safe persistent file logging.
 
 Designed as an educational and technical portfolio demonstration for systems programming and operating systems concepts, it illustrates low-level Win32 thread management, critical sections, event signaling, and deadlock reproduction.
 
@@ -22,41 +22,23 @@ Designed as an educational and technical portfolio demonstration for systems pro
 
 ## Problem Statement
 
-* **Theoretical Concurrency Concepts**: IPC mechanisms, mutex locks, and thread synchronization are often studied theoretically without hands-on runtime visibility into data handoffs.
-* **Race Conditions & Lock Contention**: Unsynchronized concurrent memory access leads to undefined behavior and race conditions that require strict synchronization boundaries.
-* **Lack of State Transparency**: Standard terminal utilities often hide thread lifecycle transitions (`CREATED`, `RUNNING`, `WAITING`, `TERMINATED`) during execution.
-* **Deadlock Demonstration**: Understanding circular wait conditions requires a controlled environment that safely illustrates how un-ordered lock acquisition causes permanent execution stalls.
+- **Theoretical Concurrency Concepts:** IPC mechanisms, mutex locks, and thread synchronization are often studied theoretically without hands-on runtime visibility into data handoffs.
+- **Race Conditions & Lock Contention:** Unsynchronized concurrent memory access leads to undefined behavior and race conditions that require strict synchronization boundaries.
+- **Lack of State Transparency:** Standard terminal utilities often hide thread lifecycle transitions (`CREATED`, `RUNNING`, `WAITING`, `TERMINATED`) during execution.
+- **Deadlock Demonstration:** Understanding circular wait conditions requires a controlled environment that safely illustrates how inverted lock acquisition causes permanent execution stalls.
 
 ---
 
 ## Key Features
 
-### 1. Multi-Threaded IPC Simulations
-* **Pipe IPC Simulation**: Spawns sender and receiver threads (`Pipe-Sender`, `Pipe-Receiver`) to perform synchronized message passing through a dedicated pipe buffer using Win32 event notifications.
-* **Message Queue Simulation**: Simulates asynchronous message delivery where the producer thread enqueues messages and triggers receiver threads via signaled events.
-* **Shared Memory Simulation**: Models shared memory read/write operations across threads protected by mutual exclusion locks.
-
-### 2. Win32 Concurrency & Synchronization
-* **Critical Sections**: Implements 7 distinct `CRITICAL_SECTION` objects (`pipe_cs`, `mq_cs`, `shm_cs`, `registry_cs`, `log_cs`, `resource_A`, `resource_B`) ensuring thread safety across shared buffers, registries, logs, and simulated resources.
-* **Event Signaling**: Utilizes auto-reset Win32 event handles (`CreateEvent`, `SetEvent`, `WaitForSingleObject`) to coordinate producer-consumer handoffs without busy waiting.
-
-### 3. Thread Lifecycle Registry
-* Maintains an in-memory registry table (`ThreadInfo thread_table[MAX_THREADS]`) tracking each thread's assigned ID, descriptive name, and active state (`THREAD_CREATED`, `THREAD_RUNNING`, `THREAD_WAITING`, `THREAD_TERMINATED`).
-* Dynamic state updates at key execution milestones (e.g., waiting for event signal, running in critical section, terminating upon task completion).
-
-### 4. Deadlock Simulation
-* Models a classic two-thread circular wait condition:
-  * `Deadlock-1` acquires `Resource A`, sleeps 100ms, and attempts to acquire `Resource B`.
-  * `Deadlock-2` acquires `Resource B`, sleeps 100ms, and attempts to acquire `Resource A`.
-* Demonstrates how inverted lock ordering causes mutual waiting and execution blockages.
-
-### 5. Metrics Dashboard & Event History
-* **IPC Metrics Dashboard**: Displays cumulative operation counters for completed Pipe, Message Queue, and Shared Memory transactions (`pipe_ops`, `mq_ops`, `shm_ops`).
-* **Event History Buffer**: Stores up to 100 recent system and thread events in memory for fast CLI inspection.
-
-### 6. Thread-Safe Persistent Logging
-* Automatically writes timestamped entries (`[HH:MM:SS] [MODULE] EVENT`) to `ipc_log.txt` under `log_cs` protection.
-* Logs application lifecycle events, data transmissions, and deadlock triggers.
+- **Pipe IPC Simulation:** Spawns sender and receiver threads (`Pipe-Sender`, `Pipe-Receiver`) to perform synchronized message passing through a dedicated pipe buffer using Win32 event notifications.
+- **Message Queue Simulation:** Simulates asynchronous FIFO message delivery where producer threads enqueue messages and trigger receiver threads via signaled events.
+- **Shared Memory Simulation:** Models shared memory read/write operations across threads protected by mutual exclusion critical sections.
+- **Win32 Critical Section Synchronization:** Implements 7 distinct `CRITICAL_SECTION` objects ensuring thread safety across shared buffers, registries, logs, and simulated resources.
+- **Event-Driven Coordination:** Utilizes auto-reset Win32 event handles (`CreateEvent`, `SetEvent`, `WaitForSingleObject`) to coordinate producer-consumer handoffs without CPU-intensive busy waiting.
+- **Thread Lifecycle Registry:** Maintains an in-memory registry table tracking thread IDs, descriptive names, and active states (`THREAD_CREATED`, `THREAD_RUNNING`, `THREAD_WAITING`, `THREAD_TERMINATED`).
+- **Deadlock Simulation:** Reproduces a classic two-thread circular wait condition demonstrating how inverted lock ordering causes mutual waiting and execution stalls.
+- **Metrics Dashboard & Thread-Safe Logging:** Real-time summary of messages sent/received, bytes transferred, and lock waits alongside `CRITICAL_SECTION`-guarded persistent file logging.
 
 ---
 
@@ -64,87 +46,43 @@ Designed as an educational and technical portfolio demonstration for systems pro
 
 | Category | Technology | Purpose |
 |---|---|---|
-| **Language** | C (C99 / Standard C) | Core simulation logic, data structures, and CLI interface |
-| **Platform** | Microsoft Windows | Native target execution environment |
-| **System API** | Win32 API (`windows.h`) | Thread creation, event signaling, critical sections, and timing |
-| **Threading** | Win32 Threads (`CreateThread`) | Asynchronous worker, sender, receiver, and deadlock threads |
-| **Synchronization** | `CRITICAL_SECTION`, `HANDLE` (Events) | Mutual exclusion locks and thread notification signals |
-| **File I/O** | Standard C File I/O (`stdio.h`) | Persistent disk logging to `ipc_log.txt` |
+| Language | C (C99 / C11 Standard) | Low-level systems programming and memory management |
+| Operating System API | Windows Win32 API (`windows.h`) | Thread creation, critical sections, event handles, and console I/O |
+| Threading & Concurrency | `CreateThread`, `WaitForSingleObject`, `CRITICAL_SECTION` | Multi-threaded execution, mutual exclusion, and thread lifecycle |
+| Synchronization Handles | `CreateEvent`, `SetEvent`, `ResetEvent` | Producer-consumer signaling and thread coordination |
+| Development Tooling | GCC (MinGW-w64) / Clang / MSVC | C compiler toolchains for Windows |
 
 ---
 
 ## Architecture
 
 ```text
-+-------------------------------------------------------------+
-|                      User CLI Interface                     |
-|                 (Interactive Console Menu)                  |
-+------------------------------+------------------------------+
-                               |
-                               v
-+-------------------------------------------------------------+
-|                     Main Thread Controller                  |
-|          Initializes Synchronization Primitives & Menu      |
-+----+--------------------+--------------------+--------------+
-     |                    |                    |
-     v                    v                    v
-+----+------------+ +-----+------------+ +-----+------------+
-|   Pipe IPC      | | Message Queue    | | Shared Memory    |
-| - pipe_sender   | | - mq_sender      | | - shm_writer     |
-| - pipe_receiver | | - mq_receiver    | | - shm_reader     |
-+----+------------+ +-----+------------+ +-----+------------+
-     |                    |                    |
-     +--------------------+--------------------+
-                          |
-                          v
-+-------------------------------------------------------------+
-|                Win32 Synchronization Layer                  |
-| - Critical Sections (pipe_cs, mq_cs, shm_cs, registry_cs)   |
-| - Win32 Events (pipe_event, mq_event, shm_event)            |
-+----+---------------------------------------------------+----+
-     |                                                   |
-     v                                                   v
-+----+------------------------+     +--------------------+----+
-| Thread Registry & Dashboard |     |  Persistent Logger      |
-| - thread_table[]            |     | - ipc_log.txt           |
-| - event_log[] & Counters    |     | - log_cs protection     |
-+-----------------------------+     +-------------------------+
+Windows Console User Interface
+             │
+             ├──> Interactive Command Menu & Options
+             │
+             ▼
+Core IPC Simulation Engine (Win32 Multi-Threading)
+  ├── 1. Pipe IPC (Pipe-Sender ──[Event Signal + CS]──> Pipe-Receiver)
+  ├── 2. Message Queue (MQ-Producer ──[FIFO Queue + Event]──> MQ-Consumer)
+  ├── 3. Shared Memory (SHM-Writer ──[Critical Section]──> SHM-Reader)
+  └── 4. Deadlock Module (Deadlock-1 vs Deadlock-2 Circular Wait)
+             │
+             ├──> Thread Registry (State Tracker: CREATED | RUNNING | WAITING | TERMINATED)
+             ├──> Aggregate Metrics Dashboard (Throughput & Lock Wait Telemetry)
+             └──> Thread-Safe File Logger (log_cs Protected File Appends)
 ```
 
 ---
 
 ## Application Flow
 
-1. **System Initialization**:
-   * Initializes 7 critical sections (`pipe_cs`, `mq_cs`, `shm_cs`, `registry_cs`, `log_cs`, `resource_A`, `resource_B`).
-   * Creates 3 auto-reset Win32 event handles (`pipe_event`, `mq_event`, `shm_event`).
-   * Writes the initial `[SYSTEM] IPC Debugger Started` entry to `ipc_log.txt`.
-
-2. **User Menu Selection**:
-   * The user selects an option (1–7, 0 to exit) from the interactive CLI menu.
-
-3. **Thread Dispatch & Registration**:
-   * For IPC options (1, 2, or 3), the main process spawns sender and receiver threads via `CreateThread`.
-   * Each thread registers itself in `thread_table` and sets its initial state to `THREAD_CREATED` and then `THREAD_RUNNING`.
-
-4. **Synchronized Data Transfer**:
-   * The sender thread enters its critical section, updates the respective shared buffer (`pipe_buffer`, `message_queue`, or `shared_memory`), increments the operation counter, logs the event, leaves the critical section, and signals the event handle via `SetEvent`.
-   * The receiver thread transitions to `THREAD_WAITING`, waits on the event handle via `WaitForSingleObject`, transitions to `THREAD_RUNNING`, reads the buffer under critical section protection, and logs the read event.
-
-5. **Thread Termination & Cleanup**:
-   * Worker threads transition their status to `THREAD_TERMINATED` in the registry table.
-   * The main thread waits for both thread handles (`WaitForSingleObject`) and releases them via `CloseHandle`.
-
-6. **Inspection & Reporting**:
-   * Choosing option 4 displays real-time operation counters on the IPC Dashboard.
-   * Choosing option 5 prints the Thread Table showing registered thread IDs, names, and states.
-   * Choosing option 6 prints the in-memory Event History log.
-
-7. **Deadlock Simulation (Option 7)**:
-   * Spawns `Deadlock-1` and `Deadlock-2` which acquire `Resource A` and `Resource B` respectively in reverse order with a 100ms delay, demonstrating unresolvable circular lock waiting.
-
-8. **Application Shutdown (Option 0)**:
-   * Logs `[SYSTEM] IPC Debugger Terminated`, deletes all critical sections, closes event handles, and cleanly exits the program.
+1. **Initialization:** The application starts, initializes all 7 Win32 critical sections, creates event handles, and resets thread tables.
+2. **Menu Selection:** The user selects an operation from the console menu (Pipe, Message Queue, Shared Memory, Deadlock, Registry, Metrics, or Clear Logs).
+3. **Thread Dispatch:** The engine spawns worker threads via `CreateThread`, assigns descriptive labels, and registers them in `thread_table`.
+4. **Synchronized Execution:** Worker threads acquire critical sections, exchange data payloads, signal completion events, and update operational metrics.
+5. **State Logging:** State transitions and IPC data packets are logged to the console and appended to `ipc_debug.log` under mutex protection.
+6. **Thread Cleanup:** Parent thread joins worker threads via `WaitForSingleObject` / `WaitForMultipleObjects` and closes thread handles.
 
 ---
 
@@ -152,12 +90,12 @@ Designed as an educational and technical portfolio demonstration for systems pro
 
 ```text
 IPC-Debugger/
-├── .vscode/
-│   └── launch.json        # Visual Studio Code C/C++ debug launch configurations
-├── ipc_debugger.c         # Complete C source code (IPC logic, threads, mutexes, CLI)
-├── ipc_debugger.exe       # Compiled native Windows executable
-├── ipc_log.txt            # Generated persistent log file with timestamps
-└── README.md              # Project documentation
+├── src/
+│   └── main.c                 # Complete C source code (threads, IPC, mutexes, menu)
+├── docs/                      # Technical documentation and architecture diagrams
+├── build.bat                  # Windows batch compilation script
+├── Makefile                   # Makefile for MinGW/Make builds
+└── README.md
 ```
 
 ---
@@ -166,38 +104,37 @@ IPC-Debugger/
 
 ### Prerequisites
 
-* **Operating System**: Microsoft Windows (10 / 11 / Server)
-* **C Compiler**: GCC (MinGW / MSYS2) or MSVC (`cl.exe`)
+- **Windows Operating System** (Windows 10/11)
+- **C Compiler**: MinGW-w64 (GCC), Clang, or Microsoft Visual C++ (MSVC)
 
 ### Compilation
 
 Using **GCC (MinGW)**:
-```cmd
-gcc ipc_debugger.c -o ipc_debugger.exe
+
+```bash
+gcc -std=c99 -Wall -O2 src/main.c -o ipc_debugger.exe
 ```
 
-Using **MSVC Developer Command Prompt**:
+Using **MSVC (Developer Command Prompt)**:
+
 ```cmd
-cl ipc_debugger.c /Fe:ipc_debugger.exe
+cl.exe /W3 /O2 src/main.c /Fe:ipc_debugger.exe
 ```
 
 ### Running the Application
 
-Execute the compiled binary from Command Prompt or PowerShell:
 ```cmd
 ipc_debugger.exe
 ```
 
-### Menu Options Reference
+---
 
-```text
-========== IPC DEBUGGER MENU ==========
-1. Pipe IPC           - Spawns sender/receiver threads for Pipe simulation
-2. Message Queue IPC  - Spawns sender/receiver threads for Message Queue simulation
-3. Shared Memory IPC  - Spawns writer/reader threads for Shared Memory simulation
-4. Show Dashboard     - Displays cumulative IPC operation metrics
-5. Show Thread Table  - Displays active/historical thread states
-6. Show Event History - Displays recent in-memory event records
-7. Simulate Deadlock  - Demonstrates circular wait contention with two worker threads
-0. Exit               - Cleans up handles/mutexes and terminates application
-```
+## Author
+
+**Sparsh Chauhan**  
+*Computer Science & Engineering Student | Systems & Full Stack Developer*
+
+- **Portfolio:** [portfolio-flame-rho-29.vercel.app](https://portfolio-flame-rho-29.vercel.app/)
+- **GitHub:** [@Sparsh88](https://github.com/Sparsh88)
+- **LinkedIn:** [linkedin.com/in/sparshchauhan08](https://linkedin.com/in/sparshchauhan08)
+- **Email:** [sparshchauhan050@gmail.com](mailto:sparshchauhan050@gmail.com)
